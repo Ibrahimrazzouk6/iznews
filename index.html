@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="IzNews — 1000+ real news articles, updated every 24 hours" />
+  <meta name="theme-color" content="#0a0f1e" />
+  <title>IzNews</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body class="min-h-screen relative">
+
+  <!-- Ambient background -->
+  <div class="bg-orb bg-orb-1" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb-3" aria-hidden="true"></div>
+
+  <!-- Progress bar -->
+  <div class="fixed top-0 left-0 right-0 z-50 h-[2px] bg-white/5" aria-hidden="true">
+    <div id="refresh-bar"></div>
+  </div>
+
+  <!-- ══════════════════════ HEADER ══════════════════════ -->
+  <header class="iz-header sticky top-0 z-40 w-full" role="banner">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-4">
+
+        <!-- Hamburger (mobile) -->
+        <button id="hamburger-btn"
+          class="lg:hidden w-9 h-9 flex flex-col justify-center items-center gap-[5px] rounded-xl hover:bg-white/8 transition-colors"
+          aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line w-3"></span>
+        </button>
+
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-3 flex-shrink-0 no-underline">
+          <div class="iz-logo-badge" aria-hidden="true">
+            <span>IZ</span>
+          </div>
+          <div class="hidden sm:block">
+            <div class="text-white font-black text-xl leading-none tracking-tight">IzNews</div>
+            <div class="text-white/35 text-[10px] font-medium mt-0.5 tracking-wide uppercase">Live · 1000+ Stories</div>
+          </div>
+        </a>
+
+        <!-- Search (desktop) -->
+        <div class="hidden md:flex flex-1 max-w-xl mx-6">
+          <div class="iz-search-wrap">
+            <svg class="iz-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input id="search-input" type="search"
+              class="iz-search-input"
+              placeholder="Search stories…" aria-label="Search news" autocomplete="off" />
+            <button id="search-btn" class="iz-search-btn" aria-label="Search">Search</button>
+          </div>
+        </div>
+
+        <!-- Right controls -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <div id="weather-widget" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full iz-chip text-sm" role="status"></div>
+          <button id="theme-toggle" class="iz-icon-btn" aria-label="Toggle theme">
+            <svg id="theme-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile search -->
+      <div class="md:hidden pb-3">
+        <div class="iz-search-wrap">
+          <svg class="iz-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="search" class="iz-search-input" placeholder="Search stories…"
+            autocomplete="off"
+            oninput="document.getElementById('search-input').value=this.value"
+            onkeydown="if(event.key==='Enter')document.getElementById('search-btn').click()" />
+          <button class="iz-search-btn" onclick="document.getElementById('search-btn').click()">Search</button>
+        </div>
+      </div>
+
+      <!-- Category nav (desktop) -->
+      <nav id="category-nav" class="hidden lg:flex gap-1.5 pb-3 overflow-x-auto no-scrollbar" aria-label="Categories"></nav>
+    </div>
+  </header>
+
+  <!-- ══════════════════════ MOBILE DRAWER ══════════════════════ -->
+  <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black/60 z-50 backdrop-blur-sm" aria-hidden="true"></div>
+  <aside id="mobile-menu" class="fixed top-0 left-0 bottom-0 w-72 z-50 iz-drawer flex flex-col"
+    role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-white/8">
+      <div class="flex items-center gap-2">
+        <div class="iz-logo-badge iz-logo-badge--sm"><span>IZ</span></div>
+        <span class="text-white font-bold">IzNews</span>
+      </div>
+      <button id="mobile-menu-close" class="iz-icon-btn" aria-label="Close">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="flex-1 p-4 overflow-y-auto" aria-label="Mobile categories">
+      <p class="text-white/30 text-[10px] uppercase tracking-widest mb-3 px-1 font-semibold">Categories</p>
+      <div id="mobile-category-nav" class="flex flex-col gap-1"></div>
+    </nav>
+    <div class="p-4 border-t border-white/8">
+      <div id="weather-widget-mobile" class="iz-chip px-3 py-2 rounded-xl text-sm text-white/60 text-center"></div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════ MAIN ══════════════════════ -->
+  <main class="relative z-10 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6" role="main">
+
+    <!-- Mobile category pills -->
+    <div class="lg:hidden mb-5 -mx-4 px-4 overflow-x-auto no-scrollbar">
+      <div class="flex gap-1.5 w-max pb-1" id="mobile-category-nav-wrapper"></div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-5 text-xs text-white/30">
+      <div class="flex items-center gap-3">
+        <span id="last-updated" class="font-medium"></span>
+        <span id="article-count" class="text-indigo-400/60 font-semibold"></span>
+      </div>
+      <span id="refresh-countdown" class="font-medium"></span>
+    </div>
+
+    <!-- Breaking ticker -->
+    <div class="iz-ticker mb-6">
+      <div class="iz-ticker-badge">
+        <span class="iz-ticker-dot"></span>
+        Live
+      </div>
+      <div class="overflow-hidden flex-1 min-w-0">
+        <div id="breaking-ticker" class="text-white/80 text-sm font-medium truncate transition-opacity duration-300">
+          Loading latest stories…
+        </div>
+      </div>
+    </div>
+
+    <!-- News grid -->
+    <section aria-label="News articles" aria-live="polite">
+      <div id="news-grid"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+        role="feed">
+      </div>
+    </section>
+
+    <!-- Load more (when scrolled to bottom) -->
+    <div id="load-more-sentinel" class="h-10 mt-8"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 py-8 border-t border-white/5 mt-4" role="contentinfo">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="iz-logo-badge iz-logo-badge--sm"><span>IZ</span></div>
+        <span class="text-white/50 font-bold text-sm">IzNews</span>
+      </div>
+      <p class="text-white/25 text-xs">
+        Powered by <a href="https://newsapi.org" target="_blank" rel="noopener noreferrer" class="text-white/40 hover:text-white/70 transition-colors">NewsAPI</a>
+        &nbsp;·&nbsp; Weather by <a href="https://open-meteo.com" target="_blank" rel="noopener noreferrer" class="text-white/40 hover:text-white/70 transition-colors">Open-Meteo</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2" aria-live="assertive" role="log"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

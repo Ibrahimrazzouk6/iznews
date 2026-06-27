@@ -1,0 +1,25 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Redirect NewsAPI through Netlify function
+[[redirects]]
+  from = "/api/news/*"
+  to = "/.netlify/functions/proxy-news/:splat"
+  status = 200
+
+# Redirect RSS through Netlify function
+[[redirects]]
+  from = "/rss/*"
+  to = "/.netlify/functions/proxy-rss/:splat"
+  status = 200
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
