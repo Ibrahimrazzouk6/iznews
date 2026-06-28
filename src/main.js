@@ -1,6 +1,5 @@
 import './styles/main.css';
 import { fetchAllNews, fetchTopHeadlines, searchNews } from './services/NewsService.js';
-import { fetchWeather } from './services/WeatherService.js';
 import { renderSkeletons } from './components/SkeletonCard.js';
 import { createNewsCard, bindCardEvents, initLazyImages } from './components/NewsCard.js';
 import { createErrorState } from './components/ErrorState.js';
@@ -37,7 +36,6 @@ const mobileCategoryNav= $('mobile-category-nav');
 const themeToggle      = $('theme-toggle');
 const refreshCountdown = $('refresh-countdown');
 const refreshBar       = $('refresh-bar');
-const weatherWidget    = $('weather-widget');
 const toastContainer   = $('toast-container');
 const lastUpdated      = $('last-updated');
 const articleCount     = $('article-count');
@@ -198,20 +196,6 @@ function resetCountdown() {
   }, 1000);
 }
 
-// ─── Weather ──────────────────────────────────────────────────
-async function loadWeather() {
-  if (!weatherWidget) return;
-  const data = await fetchWeather();
-  if (data) {
-    weatherWidget.innerHTML = `
-      <span class="text-base">${data.icon}</span>
-      <span class="text-sm text-white/80">${data.city}</span>
-      <span class="text-sm font-semibold text-white">${data.temp}${data.unit}</span>`;
-    weatherWidget.title = data.condition;
-    weatherWidget.classList.remove('hidden');
-  }
-}
-
 // ─── Toast ────────────────────────────────────────────────────
 function showToast(msg, type = 'info') {
   if (!toastContainer) return;
@@ -251,4 +235,4 @@ const translations = {
 document.title = 'IzNews';
 applyTheme(state.theme);
 renderCategoryPills();
-Promise.all([loadNews(), loadWeather()]);
+loadNews();
